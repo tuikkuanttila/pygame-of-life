@@ -1,6 +1,5 @@
 '''
 Game of Life
-Homework for 2nd PyLadies Helsinki Meetup
 
 '''
 
@@ -10,7 +9,7 @@ from pygame.locals import *
 
 ROWS = 100
 COLUMNS = 100 
-START_POPULATION = 500
+START_POPULATION = 800
 
 def get_neighbours(row,column,current_gen):
     '''
