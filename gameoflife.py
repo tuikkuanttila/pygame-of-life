@@ -133,16 +133,50 @@ if __name__ == '__main__':
     fpsClock = pygame.time.Clock()
     white = pygame.Color(255,255,255)
     black = pygame.Color(0,0,0)
-    screen = pygame.display.set_mode((640,480))
+    screen = pygame.display.set_mode((800,600))
+    mousex, mousey = 0,0
     
     #Current generation is stored here
     current_gen = [[ r*0 for r in range(ROWS)] for c in range(COLUMNS)]
 
     #Next generation is calculated into this matrix and then drawn
     next_gen = [[ r*0 for r in range(ROWS)] for c in range(COLUMNS)]
+   
+    #Text on screen
+    msg = 'Click to create initial conditions. Press q to start, or r for random conditions.'
+    font_object = pygame.font.SysFont("monospace", 15)
+    label = font_object.render(msg, 1, black)
+    
+    start_game = False
 
-    random_init(current_gen,START_POPULATION)
+    while True:
+        screen.fill(white)
+        screen.blit(label, (0, 0))
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_r:
+                    random_init(current_gen,START_POPULATION)
+                    start_game = True
+                    break
+                if event.key == K_q:
+                    start_game= True
+                    break
+            if event.type == MOUSEBUTTONUP:
+                mousex, mousey = event.pos
+                mousex = mousex/5
+                mousey = mousey/5
+                print mousex,mousey
+                if current_gen[mousex][mousey] == 0:
+                    current_gen[mousex][mousey] = 1
+                else:
+                    current_gen[mousex][mousey] = 0
+        draw_rect(screen,current_gen,black)
+            
 	
+        pygame.display.update()
+        if start_game:
+            break
+
     while True:
         #Loop forever (quit with ctrl-c)
         screen.fill(white)
