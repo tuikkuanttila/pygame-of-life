@@ -165,7 +165,6 @@ if __name__ == '__main__':
                 mousex, mousey = event.pos
                 mousex = mousex/5
                 mousey = mousey/5
-                print mousex,mousey
                 if current_gen[mousex][mousey] == 0:
                     current_gen[mousex][mousey] = 1
                 else:
@@ -185,7 +184,6 @@ if __name__ == '__main__':
         
         current_gen = next_gen
         if is_empty(current_gen):
-            # This happens too much..
             break
         
         
