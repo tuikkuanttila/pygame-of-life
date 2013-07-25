@@ -7,9 +7,9 @@ import random
 import pygame
 from pygame.locals import *
 
-ROWS = 100
-COLUMNS = 100 
-START_POPULATION = 700
+ROWS = 600
+COLUMNS = 600 
+START_POPULATION = 2000
 
 def get_neighbours(row,column,current_gen):
     '''
@@ -45,23 +45,28 @@ def one_tick(current_gen, next_gen):
 
             cells = get_neighbours(row,column,current_gen)
             live = live_cells(cells)
+            #print cells
+            #print live
 
             # Rules for Game of Life
-            # 1. A live cell with fewer than 2 live neighbours dies
-            if live < 2 and current_gen[row][column] == 1:
-                next_gen[row][column] = 0
-                
-            # 2. A live cell with two or three live neighbours lives
-            elif live > 2 and live < 4 and current_gen[row][column] == 1:
-                next_gen[row][column] = 1
+            if current_gen[row][column] == 1:
+                # 1. A live cell with fewer than 2 live neighbours dies
+                if live < 2:
+                    next_gen[row][column] = 0
 
-            # 3. A live cell with more than 3 live neigbours dies
-            elif live > 3 and current_gen[row][column] == 1:
-                next_gen[row][column] = 0
+                # 2. A live cell with two or three live neighbours lives
+                elif live > 1 and live < 4:
+                    next_gen[row][column] = 1
+
+                # 3. A live cell with more than 3 live neigbours dies
+                elif live > 3:
+                    next_gen[row][column] = 0
 
             # 4. A dead cell with 3 live neighbours becomes a live one    
-            elif current_gen[row][column] == 0 and live == 3:
-                next_gen[row][column] = 1
+            else: 
+                if live == 3:
+                    next_gen[row][column] = 1
+
 
 '''
 
@@ -126,6 +131,14 @@ def draw_rect(surface,gen,color):
             if gen[x][y] == 1:
                 pygame.draw.rect(surface,color,(x*5,y*5,5,5))
 
+
+def copy_array(first_array,second_array):
+    ''' Copies second_array to first_array,
+    second_array is not affected. '''
+    for x in range(ROWS):
+        for y in range(COLUMNS):
+            first_array[x][y] = second_array[x][y]
+
 if __name__ == '__main__':
     
     # Initialise graphics
@@ -133,7 +146,7 @@ if __name__ == '__main__':
     fpsClock = pygame.time.Clock()
     white = pygame.Color(255,255,255)
     black = pygame.Color(0,0,0)
-    screen = pygame.display.set_mode((800,600))
+    screen = pygame.display.set_mode((600,600))
     mousex, mousey = 0,0
     
     #Current generation is stored here
@@ -169,6 +182,7 @@ if __name__ == '__main__':
                     current_gen[mousex][mousey] = 1
                 else:
                     current_gen[mousex][mousey] = 0
+                print(get_neighbours(mousex,mousey,current_gen))
         draw_rect(screen,current_gen,black)
             
 	
@@ -182,10 +196,11 @@ if __name__ == '__main__':
         one_tick(current_gen,next_gen)
         draw_rect(screen,next_gen,black)
         
-        current_gen = next_gen
+        # set current_gen = next_gen
+        copy_array(current_gen, next_gen)
+
         if is_empty(current_gen):
             break
-        
         
         pygame.display.update()
         fpsClock.tick(5)
