@@ -158,22 +158,25 @@ if __name__ == '__main__':
     next_gen = [[ r*0 for r in range(ROWS)] for c in range(COLUMNS)]
    
     #Text on screen
-    msg = 'Click to create initial conditions. Press q to start, or r for random conditions.'
+    msg = 'Click to create initial conditions.' 
+    msg2 = 'Press s to start, or r for random conditions.'
     font_object = pygame.font.SysFont("monospace", 15)
-    label = font_object.render(msg, 1, black)
+    label1 = font_object.render(msg, 1, black)
+    label2 = font_object.render(msg2,1,black)
     
     start_game = False
 
     while True:
         screen.fill(white)
-        screen.blit(label, (0, 0))
+        screen.blit(label1, (0, 0))
+		screen.blit(label2,(0,10))
         for event in pygame.event.get():
             if event.type == KEYDOWN:
                 if event.key == K_r:
                     random_init(current_gen,START_POPULATION)
                     start_game = True
                     break
-                if event.key == K_q:
+                if event.key == K_s:
                     start_game= True
                     break
             if event.type == MOUSEBUTTONUP:
