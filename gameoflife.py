@@ -7,9 +7,11 @@ import random
 import pygame
 from pygame.locals import *
 
-ROWS = 100
-COLUMNS = 100 
-START_POPULATION = 800
+
+ROWS = 600
+COLUMNS = 600 
+START_POPULATION = 2000
+
 
 def get_neighbours(row,column,current_gen):
     '''
@@ -45,23 +47,28 @@ def one_tick(current_gen, next_gen):
 
             cells = get_neighbours(row,column,current_gen)
             live = live_cells(cells)
+            #print cells
+            #print live
 
             # Rules for Game of Life
-            # 1. A live cell with fewer than 2 live neighbours dies
-            if live < 2 and current_gen[row][column] == 1:
-                next_gen[row][column] = 0
-                
-            # 2. A live cell with two or three live neighbours lives
-            elif live > 2 and live < 4 and current_gen[row][column] == 1:
-                next_gen[row][column] = 1
+            if current_gen[row][column] == 1:
+                # 1. A live cell with fewer than 2 live neighbours dies
+                if live < 2:
+                    next_gen[row][column] = 0
 
-            # 3. A live cell with more than 3 live neigbours dies
-            elif live > 3 and current_gen[row][column] == 1:
-                next_gen[row][column] = 0
+                # 2. A live cell with two or three live neighbours lives
+                elif live > 1 and live < 4:
+                    next_gen[row][column] = 1
+
+                # 3. A live cell with more than 3 live neigbours dies
+                elif live > 3:
+                    next_gen[row][column] = 0
 
             # 4. A dead cell with 3 live neighbours becomes a live one    
-            elif current_gen[row][column] == 0 and live == 3:
-                next_gen[row][column] = 1
+            else: 
+                if live == 3:
+                    next_gen[row][column] = 1
+
 
 '''
 
@@ -126,6 +133,14 @@ def draw_rect(surface,gen,color):
             if gen[x][y] == 1:
                 pygame.draw.rect(surface,color,(x*5,y*5,5,5))
 
+
+def copy_array(first_array,second_array):
+    ''' Copies second_array to first_array,
+    second_array is not affected. '''
+    for x in range(ROWS):
+        for y in range(COLUMNS):
+            first_array[x][y] = second_array[x][y]
+
 if __name__ == '__main__':
     
     # Initialise graphics
@@ -133,27 +148,61 @@ if __name__ == '__main__':
     fpsClock = pygame.time.Clock()
     white = pygame.Color(255,255,255)
     black = pygame.Color(0,0,0)
-    screen = pygame.display.set_mode((640,480))
+    screen = pygame.display.set_mode((600,600))
+    mousex, mousey = 0,0
     
     #Current generation is stored here
     current_gen = [[ r*0 for r in range(ROWS)] for c in range(COLUMNS)]
 
     #Next generation is calculated into this matrix and then drawn
     next_gen = [[ r*0 for r in range(ROWS)] for c in range(COLUMNS)]
+   
+    #Text on screen
+    msg = 'Click to create initial conditions. Press q to start, or r for random conditions.'
+    font_object = pygame.font.SysFont("monospace", 15)
+    label = font_object.render(msg, 1, black)
+    
+    start_game = False
 
-    random_init(current_gen,START_POPULATION)
+    while True:
+        screen.fill(white)
+        screen.blit(label, (0, 0))
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_r:
+                    random_init(current_gen,START_POPULATION)
+                    start_game = True
+                    break
+                if event.key == K_q:
+                    start_game= True
+                    break
+            if event.type == MOUSEBUTTONUP:
+                mousex, mousey = event.pos
+                mousex = mousex/5
+                mousey = mousey/5
+                if current_gen[mousex][mousey] == 0:
+                    current_gen[mousex][mousey] = 1
+                else:
+                    current_gen[mousex][mousey] = 0
+                print(get_neighbours(mousex,mousey,current_gen))
+        draw_rect(screen,current_gen,black)
+            
 	
+        pygame.display.update()
+        if start_game:
+            break
+
     while True:
         #Loop forever (quit with ctrl-c)
         screen.fill(white)
         one_tick(current_gen,next_gen)
         draw_rect(screen,next_gen,black)
         
-        current_gen = next_gen
+        # set current_gen = next_gen
+        copy_array(current_gen, next_gen)
+
         if is_empty(current_gen):
-            # This happens too much..
             break
-        
         
         pygame.display.update()
         fpsClock.tick(5)

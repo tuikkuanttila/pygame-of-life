@@ -2,6 +2,7 @@
 
 using Python and Pygame.
 
-The starting generation is created by placing cells in
-random places, thus most games will not last long, or
-might get stuck if cells form squares. Just try again.
+Click on screen to create initial generation, or press
+'r' for random conditions. Press 'q' to start the game.
+If all cells die, the program quits. Quit the program
+with ctrl-c.
